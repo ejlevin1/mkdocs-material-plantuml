@@ -1,28 +1,44 @@
-FROM ubuntu:bionic
-
-RUN apt-get update && \
-    apt-get install -y git curl python3 python3-pip default-jre graphviz && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN curl -L http://sourceforge.net/projects/plantuml/files/plantuml.1.2019.3.jar/download > /opt/plantuml.jar
-
-ENV LC_ALL=C.UTF-8
-ENV LANG=C.UTF-8
-
+FROM alpine:3.14 as downloader
 WORKDIR /tmp
 
-RUN git clone --branch 4.0.2 https://github.com/squidfunk/mkdocs-material.git && \
-    cd mkdocs-material && \
-    python3 setup.py install && \
-    cd - && \
-    rm -fr mkdocs-material && \
-    pip3 install plantuml-markdown
+RUN  apk update \
+  && apk upgrade \
+  && apk add --update \
+    ca-certificates \
+    wget \
+  && update-ca-certificates \
+  && rm -rf /var/cache/apk/*
 
-COPY bin/plantuml /usr/bin/plantuml
-RUN chmod 755 /usr/bin/plantuml
+ARG PLANTUML_VERSION=1.2022.5
+RUN wget "http://sourceforge.net/projects/plantuml/files/plantuml.${PLANTUML_VERSION}.jar/download" -O plantuml.jar
+
+
+FROM squidfunk/mkdocs-material:latest as runtime
+
+# Let's add Java to the container
+RUN apk update \
+  && apk upgrade \
+  && apk add ca-certificates \
+  && update-ca-certificates \
+  && apk add --update \
+    coreutils \
+  && rm -rf /var/cache/apk/*   \ 
+  && apk add --update \
+    openjdk11 \
+    tzdata \
+    curl \
+    unzip \
+    graphviz \
+    ttf-dejavu \
+  && apk add --no-cache \
+    nss \
+  && rm -rf /var/cache/apk/*
+
+RUN pip3 install --no-cache-dir \
+      plantuml-markdown
+
+COPY --from=downloader /tmp/plantuml.jar /opt/plantuml.jar
+COPY ./bin/plantuml /usr/bin/plantuml 
+RUN chmod +x /usr/bin/plantuml
 
 WORKDIR /docs
-EXPOSE 8000
-
-ENTRYPOINT ["mkdocs"]
-CMD ["serve", "--dev-addr=0.0.0.0:8000"]
