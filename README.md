@@ -4,17 +4,17 @@ A distribution combining [mkdocs-material](https://squidfunk.github.io/mkdocs-ma
 
 ## Quick start
 
-Follow the setup instructions from mkdocs-material. Add `plantuml-markdown` to the `markdown_extensions` list in `mkdocs.yml`.
+Follow the setup instructions from mkdocs-material. Add `plantuml_-_markdown` to the `markdown_extensions` list in `mkdocs.yml`.
 
 ```yaml
 markdown_extensions:
-    - plantuml-markdown
+    - plantuml_markdown
 ```
 
 Then launch the container with:
 
 ```bash
-docker run -it --rm -p 8000:8000 -v ${PWD}:/docs amarraja/mkdocs-material-plantuml
+docker run --rm -v ${PWD}:/docs ghcr.io/ejlevin1/mkdocs-material-plantuml:main build
 ```
 
 And navigate to [http://localhost:8000/](http://localhost:8000/)
