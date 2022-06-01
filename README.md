@@ -11,13 +11,11 @@ markdown_extensions:
     - plantuml_markdown
 ```
 
-Then launch the container with:
+Then generate your site using the following command:
 
 ```bash
-docker run --rm -v ${PWD}:/docs ghcr.io/ejlevin1/mkdocs-material-plantuml:main build
+docker run --rm -v $(PWD):/docs ghcr.io/ejlevin1/mkdocs-material-plantuml:main build
 ```
-
-And navigate to [http://localhost:8000/](http://localhost:8000/)
 
 Add a UML block like so:
 
